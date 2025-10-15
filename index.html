@@ -3,674 +3,791 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grafik Eadie-Hofstee - Interpretasi Efisiensi Enzim</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <title>Analisis Kinetika Enzim - Soal 2: Interpretasi Efisiensi Enzim</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-            min-height: 100vh;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding: 40px 0;
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
         }
         
-        .main-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
         }
-
-        .header-section {
-            text-align: center;
-            margin-bottom: 50px;
-            animation: fadeInDown 0.8s ease-out;
+        
+        .navbar {
+            background: rgba(44, 62, 80, 0.95);
+            backdrop-filter: blur(10px);
         }
-
-        @keyframes fadeInDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .main-title {
-            font-size: 4rem;
-            font-weight: 900;
-            background: linear-gradient(90deg, #60a5fa 0%, #22d3ee 50%, #a78bfa 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            margin-bottom: 15px;
-            text-shadow: 0 0 40px rgba(96, 165, 250, 0.3);
-            letter-spacing: -1px;
-        }
-
-        .subtitle {
-            color: #93c5fd;
-            font-size: 1.5rem;
-            font-weight: 300;
-            letter-spacing: 1px;
-        }
-
-        .chart-container {
+        
+        .container-main {
             background: white;
-            border-radius: 25px;
-            padding: 40px;
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
-            margin-bottom: 40px;
-            animation: fadeInUp 0.8s ease-out 0.2s both;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        #eadieChart {
-            max-height: 650px !important;
-            height: 650px !important;
-        }
-
-        .equation-section {
-            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
-            border: 3px solid #3b82f6;
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 40px;
-            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.2);
-            animation: fadeInUp 0.8s ease-out 0.3s both;
-        }
-
-        .equation-title {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: #1e3a8a;
-            margin-bottom: 15px;
-        }
-
-        .equation-text {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #dc2626;
-            font-family: 'Courier New', monospace;
-        }
-
-        .equation-alt {
-            font-size: 1.3rem;
-            font-weight: 600;
-            color: #2563eb;
-            font-family: 'Courier New', monospace;
-            margin-top: 10px;
-        }
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .card-premium {
-            border-radius: 25px;
-            padding: 40px;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
-            animation: fadeInUp 0.8s ease-out 0.4s both;
-        }
-
-        .result-card {
-            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
-            color: white;
-        }
-
-        .data-card {
-            background: white;
-        }
-
-        .card-header-custom {
-            display: flex;
-            align-items: center;
-            margin-bottom: 35px;
-            border-bottom: 3px solid rgba(255, 255, 255, 0.3);
-            padding-bottom: 20px;
-        }
-
-        .card-icon {
-            font-size: 3.5rem;
-            margin-right: 20px;
-        }
-
-        .card-title {
-            font-size: 2.2rem;
-            font-weight: 800;
-            margin: 0;
-        }
-
-        .metric-box {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(15px);
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 30px;
-            margin-bottom: 25px;
-            transition: all 0.3s ease;
-        }
-
-        .metric-box:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-            border-color: rgba(255, 255, 255, 0.5);
-        }
-
-        .metric-label {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .metric-value {
-            font-size: 3.5rem;
-            font-weight: 900;
-            line-height: 1;
-            margin-bottom: 8px;
-        }
-
-        .metric-unit {
-            font-size: 1rem;
-            opacity: 0.8;
-        }
-
-        .data-table {
-            width: 100%;
             border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            margin-top: 20px;
+            margin-bottom: 20px;
             overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
         }
-
-        .data-table thead {
-            background: linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%);
+        
+        .section-header {
+            background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 20px;
+            margin: -15px -15px 20px -15px;
+            border-radius: 0;
+        }
+        
+        .section-card {
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .section-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .table-custom {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .table-custom thead {
+            background: var(--secondary-color);
             color: white;
         }
-
-        .data-table th {
-            padding: 20px 25px;
-            font-size: 1.3rem;
-            font-weight: 700;
-            text-align: center;
+        
+        .formula-box {
+            background: #f8f9fa;
+            border-left: 4px solid var(--secondary-color);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
         }
-
-        .data-table td {
-            padding: 20px 25px;
-            font-size: 1.4rem;
-            font-weight: 600;
-            text-align: center;
-            border-bottom: 2px solid #e5e7eb;
+        
+        .parameter-badge {
+            font-size: 1.1em;
+            padding: 10px 15px;
+            margin: 5px;
         }
-
-        .data-table tbody tr:nth-child(even) {
-            background-color: #f8fafc;
+        
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
         }
-
-        .data-table tbody tr:hover {
-            background-color: #dbeafe;
-            transition: background-color 0.3s ease;
+        
+        .interpretation-box {
+            background: linear-gradient(135deg, #e8f5e8, #f0f8ff);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
         }
-
-        .interpretation-section {
-            background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+        
+        .conclusion-box {
+            background: linear-gradient(135deg, #fff5ee, #f0f8ff);
+            border: 2px solid var(--success-color);
+            border-radius: 10px;
+            padding: 20px;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.8s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .input-group-text {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+        }
+        
+        .btn-custom {
+            background: linear-gradient(45deg, var(--secondary-color), #5dade2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
             border-radius: 25px;
-            padding: 40px;
-            color: white;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
-            animation: fadeInUp 0.8s ease-out 0.5s both;
-        }
-
-        .interpret-box {
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(15px);
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 18px;
-            padding: 30px;
-            margin-bottom: 25px;
             transition: all 0.3s ease;
         }
-
-        .interpret-box:hover {
-            background: rgba(255, 255, 255, 0.25);
-            transform: translateX(10px);
+        
+        .btn-custom:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
         }
-
-        .interpret-title {
-            font-size: 1.5rem;
-            font-weight: 800;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-        }
-
-        .interpret-title::before {
-            content: '✓';
-            font-size: 2rem;
-            margin-right: 15px;
-            color: #fde047;
-        }
-
-        .interpret-text {
-            font-size: 1.2rem;
-            line-height: 1.8;
-            margin: 0;
-        }
-
-        .highlight-text {
-            color: #fde047;
-            font-weight: 900;
-            font-size: 1.5rem;
-            text-shadow: 0 2px 10px rgba(253, 224, 71, 0.3);
-        }
-
-        @media (max-width: 768px) {
-            .main-title {
-                font-size: 2.5rem;
-            }
-            
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .chart-container {
-                padding: 20px;
-            }
-            
-            #eadieChart {
-                height: 400px !important;
-            }
+        
+        .static-chart {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
-    <div class="main-container">
-        <!-- Header -->
-        <div class="header-section">
-            <h1 class="main-title">GRAFIK EADIE-HOFSTEE</h1>
-            <p class="subtitle">Interpretasi Efisiensi Enzim</p>
+    <!-- Navigation -->
+    <nav class="navbar navbar-dark">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1">
+                <i class="bi bi-graph-up-arrow"></i> Analisis Kinetika Enzim
+            </span>
         </div>
+    </nav>
 
-        <!-- Grafik -->
-        <div class="chart-container">
-            <canvas id="eadieChart"></canvas>
-        </div>
-
-        <!-- Persamaan -->
-        <div class="equation-section">
-            <div class="equation-title text-center">📐 PERSAMAAN GARIS</div>
-            <div class="text-center">
-                <div class="equation-text" id="equation1"></div>
-                <div class="equation-alt" id="equation2"></div>
+    <div class="container mt-4">
+        <div class="container-main">
+            <!-- Header -->
+            <div class="text-center py-4">
+                <h1 class="display-4 text-primary mb-2">
+                    <i class="bi bi-clipboard-data"></i> Analisis Kinetika Enzim
+                </h1>
+                <h2 class="h3 text-secondary">Soal 2: Interpretasi Efisiensi Enzim</h2>
+                <p class="lead text-muted">Analisis komprehensif parameter kinetika enzim menggunakan plot Eadie-Hofstee dan Michaelis-Menten</p>
             </div>
-        </div>
 
-        <!-- Hasil & Data -->
-        <div class="content-grid">
-            <!-- Hasil Perhitungan -->
-            <div class="card-premium result-card">
-                <div class="card-header-custom">
-                    <span class="card-icon">📈</span>
-                    <h3 class="card-title">Hasil Perhitungan</h3>
-                </div>
-                
-                <div class="metric-box">
-                    <div class="metric-label">Kecepatan Maksimum</div>
-                    <div class="metric-value">
-                        V<sub>max</sub> = <span id="vmax"></span>
+            <div class="row">
+                <!-- Data Input Section -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card section-card fade-in">
+                        <div class="section-header">
+                            <h3><i class="bi bi-table"></i> Data Eksperimen</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-custom table-striped" id="dataTable">
+                                    <thead>
+                                        <tr>
+                                            <th>[S] (mM)</th>
+                                            <th>v (μmol/min)</th>
+                                            <th>v/[S] (min⁻¹)</th>
+                                            <th>Aksi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dataTableBody">
+                                        <!-- Data akan dimuat oleh JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="mt-3">
+                                <h5>Tambah Data Baru</h5>
+                                <div class="row g-2">
+                                    <div class="col-md-4">
+                                        <div class="input-group">
+                                            <span class="input-group-text">[S]</span>
+                                            <input type="number" class="form-control" id="newS" step="0.1" placeholder="mM">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="input-group">
+                                            <span class="input-group-text">v</span>
+                                            <input type="number" class="form-control" id="newV" step="0.1" placeholder="μmol/min">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn btn-custom w-100" onclick="addData()">
+                                            <i class="bi bi-plus-circle"></i> Tambah
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="metric-unit">μmol/menit</div>
                 </div>
 
-                <div class="metric-box">
-                    <div class="metric-label">Konstanta Michaelis</div>
-                    <div class="metric-value">
-                        K<sub>M</sub> = <span id="km"></span>
+                <!-- Calculations Section -->
+                <div class="col-lg-6 mb-4">
+                    <div class="card section-card fade-in">
+                        <div class="section-header">
+                            <h3><i class="bi bi-calculator"></i> Parameter Kinetika</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-3">
+                                <span class="badge bg-primary parameter-badge" id="vmaxBadge">
+                                    V<sub>max</sub> = 6.771 μmol/min
+                                </span>
+                                <span class="badge bg-success parameter-badge" id="kmBadge">
+                                    K<sub>m</sub> = 2.741 mM
+                                </span>
+                                <span class="badge bg-info parameter-badge" id="r2Badge">
+                                    R² = 0.9603
+                                </span>
+                            </div>
+                            
+                            <div class="formula-box">
+                                <h6><i class="bi bi-graph-up"></i> Persamaan Eadie-Hofstee:</h6>
+                                <p class="mb-0"><strong>v = V<sub>max</sub> - K<sub>m</sub> × (v/[S])</strong></p>
+                                <p class="text-muted mb-0">v = 6.771 - 2.741 × (v/[S])</p>
+                            </div>
+                            
+                            <div class="formula-box">
+                                <h6><i class="bi bi-graph-up-arrow"></i> Persamaan Michaelis-Menten:</h6>
+                                <p class="mb-0"><strong>v = V<sub>max</sub> × [S] / (K<sub>m</sub> + [S])</strong></p>
+                                <p class="text-muted mb-0">v = 6.771 × [S] / (2.741 + [S])</p>
+                            </div>
+                            
+                            <button class="btn btn-custom w-100 mt-3" onclick="recalculateParameters()">
+                                <i class="bi bi-arrow-clockwise"></i> Hitung Ulang Parameter
+                            </button>
+                        </div>
                     </div>
-                    <div class="metric-unit">mM</div>
-                </div>
-
-                <div class="metric-box">
-                    <div class="metric-label">Slope (Gradien)</div>
-                    <div class="metric-value" id="slope"></div>
                 </div>
             </div>
 
-            <!-- Data Pengukuran -->
-            <div class="card-premium data-card">
-                <div class="card-header-custom">
-                    <span class="card-icon">📊</span>
-                    <h3 class="card-title" style="color: #1e40af;">Data Pengukuran</h3>
+            <!-- Visualization Section -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card section-card fade-in">
+                        <div class="section-header">
+                            <h3><i class="bi bi-bar-chart"></i> Visualisasi Grafik</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <!-- Eadie-Hofstee Plot -->
+                                <div class="col-lg-6">
+                                    <h5 class="text-center mb-3">
+                                        <i class="bi bi-graph-down"></i> Plot Eadie-Hofstee
+                                    </h5>
+                                    <img src="https://ppl-ai-code-interpreter-files.s3.amazonaws.com/web/direct-files/1bc4b534cc7fddb96e4128ab8f35977b/9d0070c0-c576-4dcf-976f-9a495bf37899/1410d984.png" 
+                                         alt="Plot Eadie-Hofstee" class="static-chart mb-3">
+                                    <div class="chart-container">
+                                        <canvas id="eadieHofsteeChart"></canvas>
+                                    </div>
+                                </div>
+                                
+                                <!-- Michaelis-Menten Plot -->
+                                <div class="col-lg-6">
+                                    <h5 class="text-center mb-3">
+                                        <i class="bi bi-graph-up-arrow"></i> Plot Michaelis-Menten
+                                    </h5>
+                                    <img src="https://ppl-ai-code-interpreter-files.s3.amazonaws.com/web/direct-files/1bc4b534cc7fddb96e4128ab8f35977b/401d0418-d81e-4323-b136-955a73944cca/aafa889b.png" 
+                                         alt="Kurva Michaelis-Menten" class="static-chart mb-3">
+                                    <div class="chart-container">
+                                        <canvas id="michaelisChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>[S]<br><small>(mM)</small></th>
-                            <th>v<br><small>(μmol/menit)</small></th>
-                            <th>v/[S]<br><small>(menit⁻¹)</small></th>
-                        </tr>
-                    </thead>
-                    <tbody id="dataTable"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- Interpretasi -->
-        <div class="interpretation-section">
-            <div class="card-header-custom">
-                <span class="card-icon">🔬</span>
-                <h3 class="card-title">Interpretasi Efisiensi Enzim</h3>
             </div>
 
-            <div class="interpret-box">
-                <div class="interpret-title">Afinitas Enzim terhadap Substrat</div>
-                <p class="interpret-text" id="interpretation1"></p>
+            <!-- Interpretation Section -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card section-card fade-in">
+                        <div class="section-header">
+                            <h3><i class="bi bi-book"></i> Interpretasi &amp; Analisis</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="interpretation-box">
+                                        <h5><i class="bi bi-speedometer2"></i> Makna V<sub>max</sub></h5>
+                                        <p><strong>V<sub>max</sub> = 6.771 μmol/min</strong> menunjukkan kecepatan reaksi maksimum yang dapat dicapai enzim ketika semua situs aktif enzim jenuh dengan substrat.</p>
+                                        <ul>
+                                            <li>Menggambarkan kapasitas katalitik maksimal enzim</li>
+                                            <li>Bergantung pada konsentrasi enzim total</li>
+                                            <li>Tidak bergantung pada konsentrasi substrat</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-4">
+                                    <div class="interpretation-box">
+                                        <h5><i class="bi bi-bullseye"></i> Makna K<sub>m</sub></h5>
+                                        <p><strong>K<sub>m</sub> = 2.741 mM</strong> adalah konstanta Michaelis yang menunjukkan konsentrasi substrat saat kecepatan reaksi mencapai setengah V<sub>max</sub>.</p>
+                                        <ul>
+                                            <li>Indikator afinitas enzim terhadap substrat</li>
+                                            <li>K<sub>m</sub> rendah = afinitas tinggi</li>
+                                            <li>K<sub>m</sub> tinggi = afinitas rendah</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-lg-4">
+                                    <div class="interpretation-box">
+                                        <h5><i class="bi bi-gear"></i> Efisiensi Katalitik</h5>
+                                        <p><strong>k<sub>cat</sub>/K<sub>m</sub></strong> merupakan parameter efisiensi katalitik yang menggambarkan seberapa efektif enzim mengkonversi substrat menjadi produk.</p>
+                                        <ul>
+                                            <li>Rasio V<sub>max</sub>/K<sub>m</sub> = 2.47 min⁻¹</li>
+                                            <li>Efisiensi katalitik moderat</li>
+                                            <li>R² = 0.9603 menunjukkan model fit yang baik</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <div class="alert alert-info">
+                                        <h5><i class="bi bi-info-circle"></i> Analisis Afinitas Enzim</h5>
+                                        <p>Dengan K<sub>m</sub> = 2.741 mM, enzim ini menunjukkan afinitas sedang terhadap substrat. Nilai ini mengindikasikan bahwa:</p>
+                                        <ul class="mb-0">
+                                            <li>Enzim mencapai setengah aktivitas maksimum pada konsentrasi substrat 2.741 mM</li>
+                                            <li>Untuk mencapai 90% V<sub>max</sub>, dibutuhkan konsentrasi substrat sekitar 24.7 mM (9 × K<sub>m</sub>)</li>
+                                            <li>Sistem ini cocok untuk kondisi dengan konsentrasi substrat dalam rentang mM</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="interpret-box">
-                <div class="interpret-title">Kecepatan Katalisis Maksimum</div>
-                <p class="interpret-text" id="interpretation2"></p>
-            </div>
-
-            <div class="interpret-box">
-                <div class="interpret-title">Karakteristik Plot Eadie-Hofstee</div>
-                <p class="interpret-text">
-                    Garis yang menurun (slope negatif) dari kiri ke kanan adalah ciri khas plot Eadie-Hofstee. 
-                    Intercept pada sumbu y memberikan nilai V<sub>max</sub>, sedangkan nilai absolut dari slope memberikan K<sub>M</sub>. 
-                    Plot ini lebih baik dalam mendeteksi kesalahan eksperimen dibandingkan dengan plot Lineweaver-Burk.
-                </p>
+            <!-- Conclusion Section -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card section-card fade-in">
+                        <div class="section-header">
+                            <h3><i class="bi bi-check-circle"></i> Kesimpulan &amp; Rekomendasi</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="conclusion-box">
+                                <h4><i class="bi bi-clipboard-check"></i> Ringkasan Hasil Analisis</h4>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Parameter Kinetika:</h6>
+                                        <ul>
+                                            <li><strong>V<sub>max</sub></strong>: 6.771 μmol/min</li>
+                                            <li><strong>K<sub>m</sub></strong>: 2.741 mM</li>
+                                            <li><strong>R²</strong>: 0.9603 (fit model sangat baik)</li>
+                                            <li><strong>Efisiensi katalitik</strong>: 2.47 min⁻¹</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Karakteristik Enzim:</h6>
+                                        <ul>
+                                            <li>Afinitas substrat: <span class="badge bg-warning">Sedang</span></li>
+                                            <li>Kapasitas katalitik: <span class="badge bg-success">Baik</span></li>
+                                            <li>Model fitting: <span class="badge bg-success">Sangat Baik</span></li>
+                                            <li>Stabilitas kinetika: <span class="badge bg-success">Konsisten</span></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-success mt-4">
+                                <h5><i class="bi bi-lightbulb"></i> Jawaban Pertanyaan Soal</h5>
+                                <p><strong>Interpretasi Efisiensi Enzim:</strong></p>
+                                <ol>
+                                    <li><strong>Kapasitas Maksimal</strong>: Enzim dapat mencapai kecepatan maksimal 6.771 μmol/min</li>
+                                    <li><strong>Afinitas Substrat</strong>: Dengan K<sub>m</sub> = 2.741 mM, enzim memiliki afinitas sedang, cocok untuk kondisi fisiologis</li>
+                                    <li><strong>Efisiensi Katalitik</strong>: Rasio k<sub>cat</sub>/K<sub>m</sub> = 2.47 min⁻¹ menunjukkan efisiensi yang memadai</li>
+                                    <li><strong>Model Kinetic</strong>: Data mengikuti kinetika Michaelis-Menten dengan R² = 0.9603</li>
+                                </ol>
+                            </div>
+                            
+                            <div class="alert alert-primary">
+                                <h5><i class="bi bi-gear-fill"></i> Rekomendasi Optimasi</h5>
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <h6>Kondisi Reaksi:</h6>
+                                        <ul>
+                                            <li>Gunakan [S] ≥ 10 mM untuk mendekati V<sub>max</sub></li>
+                                            <li>Monitor pH dan suhu optimal</li>
+                                            <li>Pertahankan konsentrasi enzim stabil</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6>Aplikasi Praktis:</h6>
+                                        <ul>
+                                            <li>Sistem cocok untuk biokatalis</li>
+                                            <li>Dapat digunakan dalam bioreactor</li>
+                                            <li>Monitoring konsentrasi substrat penting</li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <h6>Penelitian Lanjutan:</h6>
+                                        <ul>
+                                            <li>Uji inhibisi kompetitif</li>
+                                            <li>Analisis termodinamika</li>
+                                            <li>Optimasi protein engineering</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Data eksperimen
-        const rawData = [
-            { S: 0.5, v: 1.0 },
-            { S: 1.0, v: 1.8 },
-            { S: 2.0, v: 3.0 },
-            { S: 4.0, v: 4.2 },
-            { S: 8.0, v: 4.8 }
+        let experimentData = [
+            { S: 0.5, v: 1.0, v_per_S: 2.00 },
+            { S: 1.0, v: 1.8, v_per_S: 1.80 },
+            { S: 2.0, v: 3.0, v_per_S: 1.50 },
+            { S: 4.0, v: 4.2, v_per_S: 1.05 },
+            { S: 8.0, v: 4.8, v_per_S: 0.60 }
         ];
-
-        // Hitung v/[S]
-        const eadieData = rawData.map(point => ({
-            S: point.S,
-            v: point.v,
-            vPerS: point.v / point.S
-        }));
-
-        // Regresi linear
-        const n = eadieData.length;
-        const sumX = eadieData.reduce((sum, p) => sum + p.vPerS, 0);
-        const sumY = eadieData.reduce((sum, p) => sum + p.v, 0);
-        const sumXY = eadieData.reduce((sum, p) => sum + p.vPerS * p.v, 0);
-        const sumX2 = eadieData.reduce((sum, p) => sum + p.vPerS * p.vPerS, 0);
-
-        const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-        const intercept = (sumY - slope * sumX) / n;
-
-        const Vmax = intercept;
-        const KM = -slope;
-
-        // Update nilai
-        document.getElementById('vmax').textContent = Vmax.toFixed(2);
-        document.getElementById('km').textContent = KM.toFixed(2);
-        document.getElementById('slope').textContent = slope.toFixed(3);
         
-        document.getElementById('equation1').textContent = 
-            `v = ${Vmax.toFixed(2)} ${slope >= 0 ? '+' : ''} ${slope.toFixed(2)}(v/[S])`;
-        document.getElementById('equation2').textContent = 
-            `v = ${Vmax.toFixed(2)} - ${KM.toFixed(2)}(v/[S])`;
-
-        // Interpretasi
-        const affinityLevel = KM < 2 ? 'TINGGI' : KM < 5 ? 'SEDANG' : 'RENDAH';
-        document.getElementById('interpretation1').innerHTML = 
-            `Nilai K<sub>M</sub> = <strong>${KM.toFixed(2)} mM</strong> menunjukkan enzim memiliki afinitas <span class="highlight-text">${affinityLevel}</span> terhadap substrat. Semakin kecil nilai K<sub>M</sub>, semakin tinggi afinitas enzim terhadap substratnya, yang berarti enzim lebih mudah mengikat substrat pada konsentrasi rendah.`;
+        // Parameter kinetika
+        let parameters = {
+            Vmax: 6.771,
+            Km: 2.741,
+            R2: 0.9603
+        };
         
-        document.getElementById('interpretation2').innerHTML = 
-            `Nilai V<sub>max</sub> = <strong>${Vmax.toFixed(2)} μmol/menit</strong> menunjukkan kecepatan maksimum reaksi enzimatis ketika semua situs aktif enzim telah jenuh dengan substrat. Ini merupakan batas atas kecepatan reaksi yang dapat dicapai oleh enzim ini.`;
-
-        // Isi tabel
-        const tableBody = document.getElementById('dataTable');
-        eadieData.forEach(point => {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${point.S.toFixed(1)}</td>
-                <td>${point.v.toFixed(1)}</td>
-                <td style="color: #2563eb; font-weight: 700;">${point.vPerS.toFixed(3)}</td>
-            `;
-            tableBody.appendChild(row);
-        });
-
-        // Data untuk grafik
-        const xValues = eadieData.map(p => p.vPerS);
-        const yValues = eadieData.map(p => p.v);
-
-        // Data untuk garis regresi (dari ujung ke ujung)
-        const regressionX = [];
-        const regressionY = [];
+        // Charts
+        let eadieChart;
+        let michaelisChart;
         
-        // Titik awal: x = 0
-        const yAtZero = intercept + slope * 0;
-        if (yAtZero >= 0 && yAtZero <= 6) {
-            regressionX.push(0);
-            regressionY.push(yAtZero);
+        // Fungsi untuk memuat data ke tabel
+        function loadDataTable() {
+            const tbody = document.getElementById('dataTableBody');
+            tbody.innerHTML = '';
+            
+            experimentData.forEach((data, index) => {
+                const row = `
+                    <tr>
+                        <td>${data.S}</td>
+                        <td>${data.v}</td>
+                        <td>${data.v_per_S.toFixed(2)}</td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-danger" onclick="removeData(${index})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
         }
         
-        // Titik-titik tengah untuk smoothness
-        for (let i = 1; i <= 99; i++) {
-            const x = i * 0.025;
-            const y = intercept + slope * x;
-            if (y >= 0 && y <= 6 && x <= 2.5) {
-                regressionX.push(x);
-                regressionY.push(y);
+        // Fungsi untuk menambah data
+        function addData() {
+            const newS = parseFloat(document.getElementById('newS').value);
+            const newV = parseFloat(document.getElementById('newV').value);
+            
+            if (newS > 0 && newV > 0) {
+                const newVPerS = newV / newS;
+                experimentData.push({ S: newS, v: newV, v_per_S: newVPerS });
+                
+                // Clear inputs
+                document.getElementById('newS').value = '';
+                document.getElementById('newV').value = '';
+                
+                // Reload table and recalculate
+                loadDataTable();
+                recalculateParameters();
+                updateCharts();
+            } else {
+                alert('Masukkan nilai [S] dan v yang valid (> 0)');
             }
         }
         
-        // Titik akhir: x = 2.5 atau sampai y = 0
-        const yAtMax = intercept + slope * 2.5;
-        if (yAtMax >= 0) {
-            regressionX.push(2.5);
-            regressionY.push(yAtMax);
-        } else {
-            // Cari titik potong dengan y = 0
-            const xAtYZero = -intercept / slope;
-            if (xAtYZero >= 0 && xAtYZero <= 2.5) {
-                regressionX.push(xAtYZero);
-                regressionY.push(0);
+        // Fungsi untuk menghapus data
+        function removeData(index) {
+            if (experimentData.length > 2) {
+                experimentData.splice(index, 1);
+                loadDataTable();
+                recalculateParameters();
+                updateCharts();
+            } else {
+                alert('Minimal 2 data point diperlukan untuk analisis');
             }
         }
-
-        // Buat grafik dengan Chart.js
-        const ctx = document.getElementById('eadieChart').getContext('2d');
-        const chart = new Chart(ctx, {
-            type: 'scatter',
-            data: {
-                datasets: [
-                    {
-                        label: 'Data Eksperimen',
-                        data: xValues.map((x, i) => ({ x: x, y: yValues[i] })),
-                        backgroundColor: '#2563eb',
-                        borderColor: '#1e40af',
-                        borderWidth: 4,
-                        pointRadius: 14,
-                        pointHoverRadius: 18,
-                        pointHoverBackgroundColor: '#3b82f6',
-                        pointHoverBorderColor: '#1e3a8a',
-                        pointHoverBorderWidth: 5
-                    },
-                    {
-                        label: 'Garis Regresi Linear',
-                        data: regressionX.map((x, i) => ({ x: x, y: regressionY[i] })),
-                        type: 'line',
-                        borderColor: '#dc2626',
-                        backgroundColor: 'transparent',
-                        borderWidth: 5,
-                        pointRadius: 0,
-                        tension: 0,
-                        borderCapStyle: 'round',
-                        clip: false
-                    },
-                    {
-                        label: `Vmax = ${Vmax.toFixed(2)} μmol/menit`,
-                        data: [{ x: 0, y: Vmax }, { x: 2.5, y: Vmax }],
-                        type: 'line',
-                        borderColor: '#f59e0b',
-                        backgroundColor: 'transparent',
-                        borderWidth: 3,
-                        borderDash: [15, 8],
-                        pointRadius: 0,
-                        tension: 0,
-                        clip: false
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: true,
-                plugins: {
-                    title: {
-                        display: false
-                    },
-                    legend: {
-                        display: true,
-                        position: 'top',
-                        labels: {
-                            font: {
-                                size: 16,
-                                weight: 'bold',
-                                family: "'Segoe UI', sans-serif"
-                            },
-                            padding: 20,
-                            usePointStyle: true,
-                            pointStyle: 'circle',
-                            boxWidth: 15,
-                            boxHeight: 15
+        
+        // Fungsi untuk menghitung ulang parameter
+        function recalculateParameters() {
+            if (experimentData.length < 2) return;
+            
+            // Linear regression untuk Eadie-Hofstee: v = Vmax - Km * (v/[S])
+            const n = experimentData.length;
+            let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+            
+            experimentData.forEach(data => {
+                const x = data.v_per_S; // v/[S]
+                const y = data.v;       // v
+                sumX += x;
+                sumY += y;
+                sumXY += x * y;
+                sumX2 += x * x;
+            });
+            
+            // Slope = -Km, Intercept = Vmax
+            const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const intercept = (sumY - slope * sumX) / n;
+            
+            parameters.Vmax = intercept;
+            parameters.Km = -slope;
+            
+            // Calculate R²
+            const yMean = sumY / n;
+            let ssRes = 0, ssTot = 0;
+            
+            experimentData.forEach(data => {
+                const yPred = intercept + slope * data.v_per_S;
+                ssRes += Math.pow(data.v - yPred, 2);
+                ssTot += Math.pow(data.v - yMean, 2);
+            });
+            
+            parameters.R2 = 1 - (ssRes / ssTot);
+            
+            // Update UI
+            updateParameterDisplay();
+        }
+        
+        // Fungsi untuk memperbarui tampilan parameter
+        function updateParameterDisplay() {
+            document.getElementById('vmaxBadge').innerHTML = `V<sub>max</sub> = ${parameters.Vmax.toFixed(3)} μmol/min`;
+            document.getElementById('kmBadge').innerHTML = `K<sub>m</sub> = ${parameters.Km.toFixed(3)} mM`;
+            document.getElementById('r2Badge').innerHTML = `R² = ${parameters.R2.toFixed(4)}`;
+        }
+        
+        // Fungsi untuk membuat chart Eadie-Hofstee
+        function createEadieHofsteeChart() {
+            const ctx = document.getElementById('eadieHofsteeChart').getContext('2d');
+            
+            const data = {
+                datasets: [{
+                    label: 'Data Eksperimen',
+                    data: experimentData.map(d => ({x: d.v_per_S, y: d.v})),
+                    backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                    borderColor: 'rgba(52, 152, 219, 1)',
+                    pointRadius: 8,
+                    pointHoverRadius: 10
+                }, {
+                    label: 'Garis Regresi',
+                    data: experimentData.map(d => ({
+                        x: d.v_per_S, 
+                        y: parameters.Vmax - parameters.Km * d.v_per_S
+                    })),
+                    type: 'line',
+                    borderColor: 'rgba(231, 76, 60, 1)',
+                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    pointRadius: 0,
+                    borderWidth: 3
+                }]
+            };
+            
+            eadieChart = new Chart(ctx, {
+                type: 'scatter',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Plot Eadie-Hofstee (R² = ${parameters.R2.toFixed(4)})`,
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
                         }
                     },
-                    tooltip: {
-                        enabled: true,
-                        backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                        titleColor: '#60a5fa',
-                        bodyColor: '#fff',
-                        borderColor: '#3b82f6',
-                        borderWidth: 3,
-                        padding: 15,
-                        displayColors: true,
-                        titleFont: {
-                            size: 16,
-                            weight: 'bold'
-                        },
-                        bodyFont: {
-                            size: 14,
-                            weight: '600'
-                        },
-                        callbacks: {
-                            title: function(context) {
-                                return context[0].dataset.label;
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'v/[S] (min⁻¹)',
+                                font: { size: 14 }
                             },
-                            label: function(context) {
-                                return [
-                                    `v/[S]: ${context.parsed.x.toFixed(3)} menit⁻¹`,
-                                    `v: ${context.parsed.y.toFixed(2)} μmol/menit`
-                                ];
+                            grid: { color: 'rgba(0,0,0,0.1)' }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'v (μmol/min)',
+                                font: { size: 14 }
+                            },
+                            grid: { color: 'rgba(0,0,0,0.1)' }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutCubic'
+                    }
+                }
+            });
+        }
+        
+        // Fungsi untuk membuat chart Michaelis-Menten
+        function createMichaelisChart() {
+            const ctx = document.getElementById('michaelisChart').getContext('2d');
+            
+            // Generate theoretical curve points
+            const theoreticalPoints = [];
+            for (let s = 0; s <= 10; s += 0.1) {
+                const v = parameters.Vmax * s / (parameters.Km + s);
+                theoreticalPoints.push({x: s, y: v});
+            }
+            
+            const data = {
+                datasets: [{
+                    label: 'Data Eksperimen',
+                    data: experimentData.map(d => ({x: d.S, y: d.v})),
+                    backgroundColor: 'rgba(52, 152, 219, 0.8)',
+                    borderColor: 'rgba(52, 152, 219, 1)',
+                    pointRadius: 8,
+                    pointHoverRadius: 10
+                }, {
+                    label: 'Kurva Teoritis',
+                    data: theoreticalPoints,
+                    type: 'line',
+                    borderColor: 'rgba(231, 76, 60, 1)',
+                    backgroundColor: 'rgba(231, 76, 60, 0.1)',
+                    pointRadius: 0,
+                    borderWidth: 3
+                }]
+            };
+            
+            michaelisChart = new Chart(ctx, {
+                type: 'scatter',
+                data: data,
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: `Kurva Michaelis-Menten (Km = ${parameters.Km.toFixed(3)} mM, Vmax = ${parameters.Vmax.toFixed(3)})`,
+                            font: { size: 16 }
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        annotation: {
+                            annotations: {
+                                vmax: {
+                                    type: 'line',
+                                    yMin: parameters.Vmax,
+                                    yMax: parameters.Vmax,
+                                    borderColor: 'rgba(46, 204, 113, 0.8)',
+                                    borderWidth: 2,
+                                    borderDash: [5, 5],
+                                    label: {
+                                        content: 'Vmax',
+                                        enabled: true,
+                                        position: 'end'
+                                    }
+                                },
+                                km: {
+                                    type: 'line',
+                                    xMin: parameters.Km,
+                                    xMax: parameters.Km,
+                                    borderColor: 'rgba(155, 89, 182, 0.8)',
+                                    borderWidth: 2,
+                                    borderDash: [5, 5],
+                                    label: {
+                                        content: 'Km',
+                                        enabled: true,
+                                        position: 'end'
+                                    }
+                                }
                             }
                         }
-                    }
-                },
-                scales: {
-                    x: {
-                        type: 'linear',
-                        position: 'bottom',
-                        min: 0,
-                        max: 2.5,
-                        title: {
-                            display: true,
-                            text: 'v/[S] (menit⁻¹)',
-                            font: {
-                                size: 22,
-                                weight: 'bold',
-                                family: "'Segoe UI', sans-serif"
+                    },
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: '[S] (mM)',
+                                font: { size: 14 }
                             },
-                            color: '#1e293b',
-                            padding: {top: 15, bottom: 0}
+                            min: 0,
+                            max: 10,
+                            grid: { color: 'rgba(0,0,0,0.1)' }
                         },
-                        ticks: {
-                            font: {
-                                size: 16,
-                                weight: '700'
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'v (μmol/min)',
+                                font: { size: 14 }
                             },
-                            color: '#334155',
-                            padding: 10,
-                            stepSize: 0.5
-                        },
-                        grid: {
-                            color: '#cbd5e1',
-                            lineWidth: 2,
-                            drawBorder: true,
-                            borderWidth: 3,
-                            borderColor: '#475569'
+                            min: 0,
+                            max: parameters.Vmax * 1.2,
+                            grid: { color: 'rgba(0,0,0,0.1)' }
                         }
                     },
-                    y: {
-                        min: 0,
-                        max: 6,
-                        title: {
-                            display: true,
-                            text: 'v (μmol/menit)',
-                            font: {
-                                size: 22,
-                                weight: 'bold',
-                                family: "'Segoe UI', sans-serif"
-                            },
-                            color: '#1e293b',
-                            padding: {top: 0, bottom: 15}
-                        },
-                        ticks: {
-                            font: {
-                                size: 16,
-                                weight: '700'
-                            },
-                            color: '#334155',
-                            padding: 10,
-                            stepSize: 1
-                        },
-                        grid: {
-                            color: '#cbd5e1',
-                            lineWidth: 2,
-                            drawBorder: true,
-                            borderWidth: 3,
-                            borderColor: '#475569'
-                        }
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutCubic'
                     }
-                },
-                interaction: {
-                    intersect: false,
-                    mode: 'nearest'
                 }
+            });
+        }
+        
+        // Fungsi untuk memperbarui charts
+        function updateCharts() {
+            if (eadieChart) {
+                eadieChart.destroy();
+            }
+            if (michaelisChart) {
+                michaelisChart.destroy();
+            }
+            
+            setTimeout(() => {
+                createEadieHofsteeChart();
+                createMichaelisChart();
+            }, 100);
+        }
+        
+        // Initialize pada saat halaman dimuat
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDataTable();
+            updateParameterDisplay();
+            
+            // Add fade-in animation to cards
+            const cards = document.querySelectorAll('.section-card');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '0';
+                    card.style.transform = 'translateY(20px)';
+                    card.style.transition = 'all 0.6s ease';
+                    
+                    setTimeout(() => {
+                        card.style.opacity = '1';
+                        card.style.transform = 'translateY(0)';
+                    }, 100);
+                }, index * 200);
+            });
+            
+            // Create charts after a short delay
+            setTimeout(() => {
+                createEadieHofsteeChart();
+                createMichaelisChart();
+            }, 1000);
+        });
+        
+        // Handle enter key in input fields
+        document.getElementById('newS').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                document.getElementById('newV').focus();
+            }
+        });
+        
+        document.getElementById('newV').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                addData();
             }
         });
     </script>
