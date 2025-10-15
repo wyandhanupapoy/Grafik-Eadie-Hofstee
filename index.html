@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grafik Eadie-Hofstee - Interpretasi Efisiensi Enzim</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 40px 0;
+        }
+        
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .main-title {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(90deg, #60a5fa 0%, #22d3ee 50%, #a78bfa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            text-shadow: 0 0 40px rgba(96, 165, 250, 0.3);
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            color: #93c5fd;
+            font-size: 1.5rem;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .chart-container {
+            background: white;
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.4);
+            margin-bottom: 40px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #eadieChart {
+            max-height: 650px !important;
+            height: 650px !important;
+        }
+
+        .equation-section {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            border: 3px solid #3b82f6;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 15px 40px rgba(59, 130, 246, 0.2);
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+        }
+
+        .equation-title {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #1e3a8a;
+            margin-bottom: 15px;
+        }
+
+        .equation-text {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #dc2626;
+            font-family: 'Courier New', monospace;
+        }
+
+        .equation-alt {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #2563eb;
+            font-family: 'Courier New', monospace;
+            margin-top: 10px;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .card-premium {
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+
+        .result-card {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+        }
+
+        .data-card {
+            background: white;
+        }
+
+        .card-header-custom {
+            display: flex;
+            align-items: center;
+            margin-bottom: 35px;
+            border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+            padding-bottom: 20px;
+        }
+
+        .card-icon {
+            font-size: 3.5rem;
+            margin-right: 20px;
+        }
+
+        .card-title {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .metric-box {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .metric-box:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .metric-label {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-value {
+            font-size: 3.5rem;
+            font-weight: 900;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+
+        .metric-unit {
+            font-size: 1rem;
+            opacity: 0.8;
+        }
+
+        .data-table {
+            width: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .data-table thead {
+            background: linear-gradient(90deg, #2563eb 0%, #1d4ed8 100%);
+            color: white;
+        }
+
+        .data-table th {
+            padding: 20px 25px;
+            font-size: 1.3rem;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .data-table td {
+            padding: 20px 25px;
+            font-size: 1.4rem;
+            font-weight: 600;
+            text-align: center;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .data-table tbody tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .data-table tbody tr:hover {
+            background-color: #dbeafe;
+            transition: background-color 0.3s ease;
+        }
+
+        .interpretation-section {
+            background: linear-gradient(135deg, #059669 0%, #0d9488 100%);
+            border-radius: 25px;
+            padding: 40px;
+            color: white;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+            animation: fadeInUp 0.8s ease-out 0.5s both;
+        }
+
+        .interpret-box {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(15px);
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 18px;
+            padding: 30px;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .interpret-box:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(10px);
+        }
+
+        .interpret-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .interpret-title::before {
+            content: '✓';
+            font-size: 2rem;
+            margin-right: 15px;
+            color: #fde047;
+        }
+
+        .interpret-text {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        .highlight-text {
+            color: #fde047;
+            font-weight: 900;
+            font-size: 1.5rem;
+            text-shadow: 0 2px 10px rgba(253, 224, 71, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+            
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                padding: 20px;
+            }
+            
+            #eadieChart {
+                height: 400px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- Header -->
+        <div class="header-section">
+            <h1 class="main-title">GRAFIK EADIE-HOFSTEE</h1>
+            <p class="subtitle">Interpretasi Efisiensi Enzim</p>
+        </div>
+
+        <!-- Grafik -->
+        <div class="chart-container">
+            <canvas id="eadieChart"></canvas>
+        </div>
+
+        <!-- Persamaan -->
+        <div class="equation-section">
+            <div class="equation-title text-center">📐 PERSAMAAN GARIS</div>
+            <div class="text-center">
+                <div class="equation-text" id="equation1"></div>
+                <div class="equation-alt" id="equation2"></div>
+            </div>
+        </div>
+
+        <!-- Hasil & Data -->
+        <div class="content-grid">
+            <!-- Hasil Perhitungan -->
+            <div class="card-premium result-card">
+                <div class="card-header-custom">
+                    <span class="card-icon">📈</span>
+                    <h3 class="card-title">Hasil Perhitungan</h3>
+                </div>
+                
+                <div class="metric-box">
+                    <div class="metric-label">Kecepatan Maksimum</div>
+                    <div class="metric-value">
+                        V<sub>max</sub> = <span id="vmax"></span>
+                    </div>
+                    <div class="metric-unit">μmol/menit</div>
+                </div>
+
+                <div class="metric-box">
+                    <div class="metric-label">Konstanta Michaelis</div>
+                    <div class="metric-value">
+                        K<sub>M</sub> = <span id="km"></span>
+                    </div>
+                    <div class="metric-unit">mM</div>
+                </div>
+
+                <div class="metric-box">
+                    <div class="metric-label">Slope (Gradien)</div>
+                    <div class="metric-value" id="slope"></div>
+                </div>
+            </div>
+
+            <!-- Data Pengukuran -->
+            <div class="card-premium data-card">
+                <div class="card-header-custom">
+                    <span class="card-icon">📊</span>
+                    <h3 class="card-title" style="color: #1e40af;">Data Pengukuran</h3>
+                </div>
+                
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>[S]<br><small>(mM)</small></th>
+                            <th>v<br><small>(μmol/menit)</small></th>
+                            <th>v/[S]<br><small>(menit⁻¹)</small></th>
+                        </tr>
+                    </thead>
+                    <tbody id="dataTable"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Interpretasi -->
+        <div class="interpretation-section">
+            <div class="card-header-custom">
+                <span class="card-icon">🔬</span>
+                <h3 class="card-title">Interpretasi Efisiensi Enzim</h3>
+            </div>
+
+            <div class="interpret-box">
+                <div class="interpret-title">Afinitas Enzim terhadap Substrat</div>
+                <p class="interpret-text" id="interpretation1"></p>
+            </div>
+
+            <div class="interpret-box">
+                <div class="interpret-title">Kecepatan Katalisis Maksimum</div>
+                <p class="interpret-text" id="interpretation2"></p>
+            </div>
+
+            <div class="interpret-box">
+                <div class="interpret-title">Karakteristik Plot Eadie-Hofstee</div>
+                <p class="interpret-text">
+                    Garis yang menurun (slope negatif) dari kiri ke kanan adalah ciri khas plot Eadie-Hofstee. 
+                    Intercept pada sumbu y memberikan nilai V<sub>max</sub>, sedangkan nilai absolut dari slope memberikan K<sub>M</sub>. 
+                    Plot ini lebih baik dalam mendeteksi kesalahan eksperimen dibandingkan dengan plot Lineweaver-Burk.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data eksperimen
+        const rawData = [
+            { S: 0.5, v: 1.0 },
+            { S: 1.0, v: 1.8 },
+            { S: 2.0, v: 3.0 },
+            { S: 4.0, v: 4.2 },
+            { S: 8.0, v: 4.8 }
+        ];
+
+        // Hitung v/[S]
+        const eadieData = rawData.map(point => ({
+            S: point.S,
+            v: point.v,
+            vPerS: point.v / point.S
+        }));
+
+        // Regresi linear
+        const n = eadieData.length;
+        const sumX = eadieData.reduce((sum, p) => sum + p.vPerS, 0);
+        const sumY = eadieData.reduce((sum, p) => sum + p.v, 0);
+        const sumXY = eadieData.reduce((sum, p) => sum + p.vPerS * p.v, 0);
+        const sumX2 = eadieData.reduce((sum, p) => sum + p.vPerS * p.vPerS, 0);
+
+        const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+        const intercept = (sumY - slope * sumX) / n;
+
+        const Vmax = intercept;
+        const KM = -slope;
+
+        // Update nilai
+        document.getElementById('vmax').textContent = Vmax.toFixed(2);
+        document.getElementById('km').textContent = KM.toFixed(2);
+        document.getElementById('slope').textContent = slope.toFixed(3);
+        
+        document.getElementById('equation1').textContent = 
+            `v = ${Vmax.toFixed(2)} ${slope >= 0 ? '+' : ''} ${slope.toFixed(2)}(v/[S])`;
+        document.getElementById('equation2').textContent = 
+            `v = ${Vmax.toFixed(2)} - ${KM.toFixed(2)}(v/[S])`;
+
+        // Interpretasi
+        const affinityLevel = KM < 2 ? 'TINGGI' : KM < 5 ? 'SEDANG' : 'RENDAH';
+        document.getElementById('interpretation1').innerHTML = 
+            `Nilai K<sub>M</sub> = <strong>${KM.toFixed(2)} mM</strong> menunjukkan enzim memiliki afinitas <span class="highlight-text">${affinityLevel}</span> terhadap substrat. Semakin kecil nilai K<sub>M</sub>, semakin tinggi afinitas enzim terhadap substratnya, yang berarti enzim lebih mudah mengikat substrat pada konsentrasi rendah.`;
+        
+        document.getElementById('interpretation2').innerHTML = 
+            `Nilai V<sub>max</sub> = <strong>${Vmax.toFixed(2)} μmol/menit</strong> menunjukkan kecepatan maksimum reaksi enzimatis ketika semua situs aktif enzim telah jenuh dengan substrat. Ini merupakan batas atas kecepatan reaksi yang dapat dicapai oleh enzim ini.`;
+
+        // Isi tabel
+        const tableBody = document.getElementById('dataTable');
+        eadieData.forEach(point => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${point.S.toFixed(1)}</td>
+                <td>${point.v.toFixed(1)}</td>
+                <td style="color: #2563eb; font-weight: 700;">${point.vPerS.toFixed(3)}</td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+        // Data untuk grafik
+        const xValues = eadieData.map(p => p.vPerS);
+        const yValues = eadieData.map(p => p.v);
+
+        // Data untuk garis regresi (dari ujung ke ujung)
+        const regressionX = [];
+        const regressionY = [];
+        
+        // Titik awal: x = 0
+        const yAtZero = intercept + slope * 0;
+        if (yAtZero >= 0 && yAtZero <= 6) {
+            regressionX.push(0);
+            regressionY.push(yAtZero);
+        }
+        
+        // Titik-titik tengah untuk smoothness
+        for (let i = 1; i <= 99; i++) {
+            const x = i * 0.025;
+            const y = intercept + slope * x;
+            if (y >= 0 && y <= 6 && x <= 2.5) {
+                regressionX.push(x);
+                regressionY.push(y);
+            }
+        }
+        
+        // Titik akhir: x = 2.5 atau sampai y = 0
+        const yAtMax = intercept + slope * 2.5;
+        if (yAtMax >= 0) {
+            regressionX.push(2.5);
+            regressionY.push(yAtMax);
+        } else {
+            // Cari titik potong dengan y = 0
+            const xAtYZero = -intercept / slope;
+            if (xAtYZero >= 0 && xAtYZero <= 2.5) {
+                regressionX.push(xAtYZero);
+                regressionY.push(0);
+            }
+        }
+
+        // Buat grafik dengan Chart.js
+        const ctx = document.getElementById('eadieChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: 'Data Eksperimen',
+                        data: xValues.map((x, i) => ({ x: x, y: yValues[i] })),
+                        backgroundColor: '#2563eb',
+                        borderColor: '#1e40af',
+                        borderWidth: 4,
+                        pointRadius: 14,
+                        pointHoverRadius: 18,
+                        pointHoverBackgroundColor: '#3b82f6',
+                        pointHoverBorderColor: '#1e3a8a',
+                        pointHoverBorderWidth: 5
+                    },
+                    {
+                        label: 'Garis Regresi Linear',
+                        data: regressionX.map((x, i) => ({ x: x, y: regressionY[i] })),
+                        type: 'line',
+                        borderColor: '#dc2626',
+                        backgroundColor: 'transparent',
+                        borderWidth: 5,
+                        pointRadius: 0,
+                        tension: 0,
+                        borderCapStyle: 'round',
+                        clip: false
+                    },
+                    {
+                        label: `Vmax = ${Vmax.toFixed(2)} μmol/menit`,
+                        data: [{ x: 0, y: Vmax }, { x: 2.5, y: Vmax }],
+                        type: 'line',
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'transparent',
+                        borderWidth: 3,
+                        borderDash: [15, 8],
+                        pointRadius: 0,
+                        tension: 0,
+                        clip: false
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    title: {
+                        display: false
+                    },
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            font: {
+                                size: 16,
+                                weight: 'bold',
+                                family: "'Segoe UI', sans-serif"
+                            },
+                            padding: 20,
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            boxWidth: 15,
+                            boxHeight: 15
+                        }
+                    },
+                    tooltip: {
+                        enabled: true,
+                        backgroundColor: 'rgba(0, 0, 0, 0.9)',
+                        titleColor: '#60a5fa',
+                        bodyColor: '#fff',
+                        borderColor: '#3b82f6',
+                        borderWidth: 3,
+                        padding: 15,
+                        displayColors: true,
+                        titleFont: {
+                            size: 16,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 14,
+                            weight: '600'
+                        },
+                        callbacks: {
+                            title: function(context) {
+                                return context[0].dataset.label;
+                            },
+                            label: function(context) {
+                                return [
+                                    `v/[S]: ${context.parsed.x.toFixed(3)} menit⁻¹`,
+                                    `v: ${context.parsed.y.toFixed(2)} μmol/menit`
+                                ];
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        type: 'linear',
+                        position: 'bottom',
+                        min: 0,
+                        max: 2.5,
+                        title: {
+                            display: true,
+                            text: 'v/[S] (menit⁻¹)',
+                            font: {
+                                size: 22,
+                                weight: 'bold',
+                                family: "'Segoe UI', sans-serif"
+                            },
+                            color: '#1e293b',
+                            padding: {top: 15, bottom: 0}
+                        },
+                        ticks: {
+                            font: {
+                                size: 16,
+                                weight: '700'
+                            },
+                            color: '#334155',
+                            padding: 10,
+                            stepSize: 0.5
+                        },
+                        grid: {
+                            color: '#cbd5e1',
+                            lineWidth: 2,
+                            drawBorder: true,
+                            borderWidth: 3,
+                            borderColor: '#475569'
+                        }
+                    },
+                    y: {
+                        min: 0,
+                        max: 6,
+                        title: {
+                            display: true,
+                            text: 'v (μmol/menit)',
+                            font: {
+                                size: 22,
+                                weight: 'bold',
+                                family: "'Segoe UI', sans-serif"
+                            },
+                            color: '#1e293b',
+                            padding: {top: 0, bottom: 15}
+                        },
+                        ticks: {
+                            font: {
+                                size: 16,
+                                weight: '700'
+                            },
+                            color: '#334155',
+                            padding: 10,
+                            stepSize: 1
+                        },
+                        grid: {
+                            color: '#cbd5e1',
+                            lineWidth: 2,
+                            drawBorder: true,
+                            borderWidth: 3,
+                            borderColor: '#475569'
+                        }
+                    }
+                },
+                interaction: {
+                    intersect: false,
+                    mode: 'nearest'
+                }
+            }
+        });
+    </script>
+</body>
+</html>
